@@ -1,0 +1,33 @@
+# Stage 1: Build application using Maven & OpenJDK 21
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS builder
+
+WORKDIR /workspace
+
+# Cache maven dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source and compile
+COPY src ./src
+RUN mvn package -DskipTests -B
+
+# Stage 2: Minimal Runtime JRE 21
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Non-root user for enterprise SecOps
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+COPY --from=builder --chown=appuser:appgroup /workspace/target/quarkus-app/lib/ /app/lib/
+COPY --from=builder --chown=appuser:appgroup /workspace/target/quarkus-app/*.jar /app/
+COPY --from=builder --chown=appuser:appgroup /workspace/target/quarkus-app/app/ /app/app/
+COPY --from=builder --chown=appuser:appgroup /workspace/target/quarkus-app/quarkus/ /app/quarkus/
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/q/health/live || exit 1
+
+ENTRYPOINT ["java", "-Dquarkus.http.host=0.0.0.0", "-jar", "/app/quarkus-run.jar"]

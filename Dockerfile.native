@@ -1,0 +1,26 @@
+# Stage 1: Build Native Binary with Mandrel / GraalVM
+FROM quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 AS native-builder
+
+USER quarkus
+WORKDIR /workspace
+
+COPY --chown=quarkus:quarkus pom.xml .
+RUN mvn dependency:go-offline -B
+
+COPY --chown=quarkus:quarkus src ./src
+RUN mvn package -Dnative -DskipTests -B
+
+# Stage 2: Distroless / Minimal C Runtime Runner (<45MB)
+FROM redhat/ubi9-micro:latest
+
+WORKDIR /work/
+RUN chown -R 1001:root /work \
+    && chmod -R "g+rwX" /work \
+    && chown -R 1001:root /work
+
+COPY --from=native-builder --chown=1001:root /workspace/target/*-runner /work/application
+
+EXPOSE 8080
+USER 1001
+
+CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
