@@ -183,6 +183,35 @@ curl -X POST http://localhost:8080/api/v1/transactions \
 
 ---
 
+## 🧠 Architectural Philosophy: Objective Stack Selection (The Pragmatic Polyglot Matrix)
+
+In professional software engineering of industrial grade, **technology stack selection is an architectural calculation based strictly on technical invariants, FinOps, concurrency models, and business SLAs—never on hype, fashion, or personal dogma.**
+
+Every language in modern distributed systems solves a concrete engineering problem better than any alternative. We evaluate each project against this deterministic decision matrix:
+
+```mermaid
+flowchart TD
+    Req[New Requirement / System Invariant] --> Q1{What is the primary constraint?}
+    
+    Q1 -->|Sub-microsecond latency / Zero GC pauses / Memory safety| Rust[<b>RUST</b><br/>Audio/Video engines, Cryptography, Edge Wasm]
+    Q1 -->|Static binary / Low-level networking / Micro-daemons| Go[<b>GO (GOLANG)</b><br/>Network proxies, CLI tooling, K8s operators]
+    Q1 -->|Enterprise transactions / EIP routing / Banking compliance| Java[<b>JAVA (QUARKUS)</b><br/>Ledgers, Camel event mesh, ACID persistence]
+    Q1 -->|Fullstack E2E velocity / Web automation / Agentic MCP| TS[<b>TYPESCRIPT</b><br/>Next.js UI, Playwright, Baileys, AI gateways]
+    Q1 -->|Deep Learning / Tensor math / Data pipelines| Python[<b>PYTHON</b><br/>Model inference, vector embeddings, ETL pipelines]
+```
+
+### Stack Evaluation Criteria Matrix
+
+| Language / Runtime | Optimal Use Case (When to choose) | When NOT to choose (Anti-Pattern) |
+| :--- | :--- | :--- |
+| **Java 21 (Quarkus / Spring)** | **Enterprise Financial Transactivity & EIP:** Core ledgers, high-throughput ACID transactions, complex integration routes (Apache Camel), and corporate compliance environments (Banking/Fintech). | Dynamic web scraping, rapid exploratory prototypes, or lightweight Cloudflare edge workers. |
+| **TypeScript / Node.js** | **E2E Developer Velocity & Agentic AI:** Fullstack contract sharing (Zod + Next.js), headless automation (Playwright), Model Context Protocol (MCP) servers, and V8 Edge Isolates. | CPU-bound math processing or applications requiring zero-garbage-collection guarantees. |
+| **Go (Golang)** | **Infrastructure & High-Concurrency Networking:** Single-binary CLI tools, network daemons, reverse proxies, and Kubernetes operators with cheap Goroutine concurrency. | Rich domain-driven design (DDD) requiring deep polymorphism, inheritance hierarchies, or complex enterprise ORMs. |
+| **Rust** | **Zero-Cost Abstractions & Memory-Safe Compute:** Low-latency audio/video pipelines, cryptography, high-performance extensions (PyO3/N-API), and WebAssembly (Wasm) modules. | Rapid CRUD development or early-stage SaaS MVPs where the borrow-checker overhead slows down time-to-market. |
+| **Python** | **Data Science & ML Engineering:** LLM fine-tuning, audio transcription (Whisper), numerical computing (NumPy/PyTorch), and scientific data pipelines. | High-concurrency I/O microservices requiring strict compile-time type verification and sub-millisecond execution. |
+
+---
+
 ## 🏛️ Architectural Verification with ArchUnit
 
 The project enforces Clean Architecture boundaries at compile/test time:
